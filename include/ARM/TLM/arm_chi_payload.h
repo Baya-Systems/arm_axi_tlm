@@ -40,7 +40,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include <ARM/TLM/arm_tlm_helpers.h>
+#include "arm_tlm_helpers.h"
 
 namespace ARM
 {

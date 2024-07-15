@@ -38,7 +38,7 @@
 
 #include <stdint.h>
 
-#include <ARM/TLM/arm_tlm_helpers.h>
+#include "arm_tlm_helpers.h"
 
 namespace ARM
 {

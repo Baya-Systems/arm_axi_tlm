@@ -45,7 +45,7 @@
 #include <string>
 #include <vector>
 
-#include <ARM/TLM/arm_chi_payload.h>
+#include <include/ARM/TLM/arm_chi_payload.h>
 
 #ifdef ARM_TLM_ENABLE_VALGRIND
 #include <valgrind/memcheck.h>

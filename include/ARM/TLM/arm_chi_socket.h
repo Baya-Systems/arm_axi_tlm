@@ -36,7 +36,7 @@
 #ifndef ARM_CHI_SOCKET_H
 #define ARM_CHI_SOCKET_H
 
-#include <ARM/TLM/arm_tlm_socket.h>
+#include "arm_tlm_socket.h"
 
 #include "arm_chi_payload.h"
 #include "arm_chi_phase.h"
