@@ -1,0 +1,50 @@
+# Please provide SYSTEMC_INC, SYSTEMC_LIB, and SYSTEMC_LIB_FILE.
+# in the environment.
+SYSTEMC_INC ?= $(error Please set SYSTEMC_INC to point to include/ for SystemC)
+SYSTEMC_LIB ?= $(error Please set SYSTEMC_LIB to point to lib/ for SystemC)
+SYSTEMC_LIB_FILE ?= $(error Please set SYSTEMC_LIB_FILE to something like: -lsystemc or: systemc.a)
+
+# Flags that may be needed depending on how you've built
+# SystemC. -fpermissive is only needed for combinations of
+# newer compilers and SystemC 2.2
+# user would like to use, say, tlm_utils sockets.
+SYSTEMC_FLAGS = -pthread -fpermissive -DSC_INCLUDE_DYNAMIC_PROCESSES
+
+# This path is for the relative locations of examples/ and include/ in an installation.
+AMBA_TLM_HOME = ../..
+
+# The user can override things here.
+CXXFLAGS =
+LDFLAGS =
+
+AMBA_TLM_CXXFLAGS = -I$(AMBA_TLM_HOME)/include
+AMBA_TLM_LDFLAGS = -L$(AMBA_TLM_HOME)/lib
+AMBA_TLM_LIBS = -larmtlmchi
+
+SYSTEMC_CXXFLAGS = $(SYSTEMC_FLAGS) -I$(SYSTEMC_INC)
+SYSTEMC_LDFLAGS = -L$(SYSTEMC_LIB)
+SYSTEMC_LIBS = $(SYSTEMC_LIB_FILE)
+
+ALL_CXXFLAGS = $(AMBA_TLM_CXXFLAGS) $(SYSTEMC_CXXFLAGS) $(CXXFLAGS)
+ALL_LDFLAGS = $(AMBA_TLM_LDFLAGS) $(SYSTEMC_LDFLAGS) $(LDFLAGS)
+ALL_LIBS = $(AMBA_TLM_LIBS) $(SYSTEMC_LIBS)
+
+all: CHITrafficExample
+
+.cpp.o:
+	$(CXX) $(ALL_CXXFLAGS) -c -o $@ $<
+
+CHIMonitor.o: CHIMonitor.cpp CHIMonitor.h CHIUtilities.h
+
+CHIMemory.o: CHIMemory.cpp CHIMemory.h CHIUtilities.h
+
+CHITrafficGenerator.o: CHITrafficGenerator.cpp CHITrafficGenerator.h
+
+CHITrafficExample.o: CHITrafficExample.cpp CHIMonitor.h CHIMemory.o CHITrafficGenerator.h
+
+CHITrafficExample: CHIMonitor.o CHIMemory.o CHITrafficGenerator.o CHITrafficExample.o
+	$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) -o $@ $^ $(ALL_LIBS)
+
+clean:
+	rm -f *.o
+	rm -f CHITrafficExample
