@@ -1,0 +1,22 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+# Both libraries link SystemC::systemc PUBLIC, so a consumer of this package needs
+# that target defined before the imported targets below can be used.
+if(NOT TARGET SystemC::systemc)
+    find_dependency(SystemCLanguage 3.0)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/arm_tlmTargets.cmake")
+
+# The add_subdirectory/FetchContent path has always defined these bare names, and
+# consumers link them. Aliasing keeps one set of target names across both ways of
+# obtaining this library, so a consumer needs no branch on how it was acquired.
+foreach(_arm_tlm_target arm_tlm armtlmaxi4 armtlmchi)
+    if(NOT TARGET ${_arm_tlm_target})
+        add_library(${_arm_tlm_target} ALIAS ARM::${_arm_tlm_target})
+    endif()
+endforeach()
+unset(_arm_tlm_target)
+
+check_required_components(arm_tlm)
