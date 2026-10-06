@@ -7,6 +7,10 @@
 
 #include <cstdint>
 
+namespace ARM {
+namespace CHI {
+namespace Examples {
+
 class CHIMemory : public sc_core::sc_module
 {
 protected:
@@ -22,6 +26,9 @@ protected:
     /* Track the number of write data beats remaining for in-progress writes, indexed by DBID. 0 indicates an unused
      * DBID. */
     std::vector<uint8_t> write_data_beats_remaining;
+
+    /* The request TxnID each in-progress write's Comp answers, indexed by DBID. */
+    std::vector<uint16_t> write_txn_ids;
 
     unsigned data_width_bytes;
 
@@ -47,5 +54,9 @@ public:
 
     sc_core::sc_in<bool> clock;
 };
+
+} // namespace Examples
+} // namespace CHI
+} // namespace ARM
 
 #endif // ARM_CHI_MEMORY_H

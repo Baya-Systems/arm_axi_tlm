@@ -8,6 +8,10 @@
 #include <tlm_utils/simple_initiator_socket.h>
 #include <tlm_utils/peq_with_cb_and_phase.h>
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 enum TransPortState
 {
     TRANS_PORT_STATE_CLEAR,
@@ -183,5 +187,9 @@ public:
 
     tlm_utils::simple_target_socket<TransGenericToAXIImp, DataWidth, tlm::tlm_base_protocol_types> target;
 };
+
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM
 
 #endif /* ARM_AXI_TRANSACTORS_H */

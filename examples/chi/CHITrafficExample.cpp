@@ -4,6 +4,8 @@
 #include "CHIMonitor.h"
 #include "CHIMemory.h"
 
+using namespace ARM::CHI::Examples;
+
 void add_payloads_to_tg(CHITrafficGenerator& tg)
 {
     tg.add_payload(ARM::CHI::REQ_OPCODE_READ_NO_SNP,  0x00001000, ARM::CHI::SIZE_4);

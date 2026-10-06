@@ -2,6 +2,10 @@
 
 #include "AXITrafficGenerator.h"
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 void AXITrafficGenerator::clock_posedge()
 {
     if (aw_state == ACK)
@@ -229,3 +233,7 @@ void AXITrafficGenerator::add_payload(ARM::AXI::Command command, uint64_t addres
     default: SC_REPORT_ERROR(name(), "can only generate read and write traffic");
     }
 }
+
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM

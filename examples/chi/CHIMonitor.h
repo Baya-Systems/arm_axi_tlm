@@ -5,6 +5,10 @@
 
 #include <ARM/TLM/arm_chi.h>
 
+namespace ARM {
+namespace CHI {
+namespace Examples {
+
 class CHIMonitor : public sc_core::sc_module
 {
 protected:
@@ -28,5 +32,9 @@ public:
     ARM::CHI::SimpleTargetSocket<CHIMonitor> target;
     ARM::CHI::SimpleInitiatorSocket<CHIMonitor> initiator;
 };
+
+} // namespace Examples
+} // namespace CHI
+} // namespace ARM
 
 #endif // ARM_CHI_MONITOR_H

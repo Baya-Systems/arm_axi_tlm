@@ -2,6 +2,10 @@
 
 #include "CHITrafficGenerator.h"
 
+namespace ARM {
+namespace CHI {
+namespace Examples {
+
 void CHITrafficGenerator::clock_posedge()
 {
     if (!channels[ARM::CHI::CHANNEL_RSP].rx_queue.empty())
@@ -12,12 +16,15 @@ void CHITrafficGenerator::clock_posedge()
         switch (rsp_flit.phase.rsp_opcode)
         {
         case ARM::CHI::RSP_OPCODE_COMP_DBID_RESP:
+            handle_dbid_resp(rsp_flit);
+            completed++;
+            break;
         case ARM::CHI::RSP_OPCODE_DBID_RESP:
         case ARM::CHI::RSP_OPCODE_DBID_RESP_ORD:
             handle_dbid_resp(rsp_flit);
             break;
         case ARM::CHI::RSP_OPCODE_COMP:
-            /* ignore a separate Comp */
+            completed++;
             break;
         default:
             SC_REPORT_ERROR(name(), "unexpected response opcode received");
@@ -33,7 +40,8 @@ void CHITrafficGenerator::clock_posedge()
         {
         case ARM::CHI::DAT_OPCODE_COMP_DATA:
         case ARM::CHI::DAT_OPCODE_DATA_SEP_RESP:
-            /* ignore returned read data */
+            /* The data itself is ignored; only its arrival is counted. */
+            handle_read_data(dat_flit);
             break;
         default:
             SC_REPORT_ERROR(name(), "unexpected read data opcode received");
@@ -75,6 +83,16 @@ void CHITrafficGenerator::handle_dbid_resp(const CHIFlit& dbid_flit)
     }
 }
 
+void CHITrafficGenerator::handle_read_data(const CHIFlit& dat_flit)
+{
+    const auto beats = transaction_data_ids(dat_flit.payload, data_width_bytes).size();
+    if (++read_beats_received[dat_flit.phase.txn_id] == beats)
+    {
+        read_beats_received.erase(dat_flit.phase.txn_id);
+        completed++;
+    }
+}
+
 void CHITrafficGenerator::clock_negedge()
 {
     /* Try to issue credits and send transactions on active channels. */
@@ -94,9 +112,12 @@ tlm::tlm_sync_enum CHITrafficGenerator::nb_transport_bw(ARM::CHI::Payload& paylo
     return tlm::TLM_ACCEPTED;
 }
 
-CHITrafficGenerator::CHITrafficGenerator(const sc_core::sc_module_name& name, const unsigned data_width_bits) :
+CHITrafficGenerator::CHITrafficGenerator(const sc_core::sc_module_name& name, const unsigned data_width_bits,
+                                         const uint16_t src_id_, const uint16_t tgt_id_) :
     sc_module(name),
     data_width_bytes{data_width_bits / 8},
+    src_id{src_id_},
+    tgt_id{tgt_id_},
     initiator("initiator", *this, &CHITrafficGenerator::nb_transport_bw, ARM::TLM::PROTOCOL_CHI_E, data_width_bits),
     clock("clock")
 {
@@ -124,8 +145,8 @@ void CHITrafficGenerator::add_payload(
     ARM::CHI::Payload& req_payload = *ARM::CHI::Payload::new_payload();
     ARM::CHI::Phase req_phase;
 
-    req_phase.tgt_id = 2;
-    req_phase.src_id = 1;
+    req_phase.tgt_id = tgt_id;
+    req_phase.src_id = src_id;
     req_phase.txn_id = txn_id++;
     req_phase.req_opcode = req_opcode;
     req_phase.order = ARM::CHI::ORDER_NO_ORDER;
@@ -138,3 +159,7 @@ void CHITrafficGenerator::add_payload(
 
     req_payload.unref();
 }
+
+} // namespace Examples
+} // namespace CHI
+} // namespace ARM

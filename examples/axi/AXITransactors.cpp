@@ -8,6 +8,10 @@
 
 #include "AXITransactors.h"
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 tlm::tlm_generic_payload* TransAXIToGenericImp::mm::allocate()
 {
     return new tlm::tlm_generic_payload(this);
@@ -556,3 +560,7 @@ TransGenericToAXIImp::TransGenericToAXIImp(sc_core::sc_module_name name, ARM::TL
 TransGenericToAXIImp::~TransGenericToAXIImp()
 {
 }
+
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM

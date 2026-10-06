@@ -5,6 +5,10 @@
 
 #include "AXIMonitor.h"
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 tlm::tlm_sync_enum AXIMonitor::nb_transport_fw(ARM::AXI::Payload& payload, ARM::AXI::Phase& phase)
 {
     ARM::AXI::Phase prev_phase = phase;
@@ -246,3 +250,6 @@ AXIMonitor::~AXIMonitor()
     delete[] beat_data;
 }
 
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM

@@ -5,6 +5,10 @@
 
 #include <ARM/TLM/arm_axi4.h>
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 class AXITrafficGenerator : public sc_core::sc_module
 {
 protected:
@@ -57,5 +61,9 @@ public:
 
     sc_core::sc_in<bool> clock;
 };
+
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM
 
 #endif /* ARM_AXI_TRAFFICGENERATOR_H */

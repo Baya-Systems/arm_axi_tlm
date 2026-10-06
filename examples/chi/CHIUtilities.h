@@ -8,6 +8,10 @@
 #include <deque>
 #include <vector>
 
+namespace ARM {
+namespace CHI {
+namespace Examples {
+
 /* Calculate a mask of bytes that may be transferred in the transaction. */
 inline uint64_t transaction_valid_bytes_mask(const ARM::CHI::Payload& payload)
 {
@@ -125,5 +129,9 @@ struct CHIChannelState
         }
     }
 };
+
+} // namespace Examples
+} // namespace CHI
+} // namespace ARM
 
 #endif // ARM_CHI_UTILITIES_H

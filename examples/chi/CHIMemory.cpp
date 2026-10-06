@@ -6,6 +6,10 @@
 #include <cstdint>
 #include <cstring>
 
+namespace ARM {
+namespace CHI {
+namespace Examples {
+
 void CHIMemory::clock_posedge()
 {
     if (!channels[ARM::CHI::CHANNEL_REQ].rx_queue.empty())
@@ -155,22 +159,33 @@ uint16_t CHIMemory::allocate_dbid_for_write(const CHIFlit& req_flit)
     auto it = std::find(write_data_beats_remaining.begin(), write_data_beats_remaining.end(), 0);
 
     if (it == write_data_beats_remaining.end())
+    {
         it = write_data_beats_remaining.insert(it, 0);
+        write_txn_ids.push_back(0);
+    }
 
     const unsigned size_bytes = 1 << req_flit.payload.size;
-    const unsigned beat_count = size_bytes <= data_width_bytes ? 1 : data_width_bytes / size_bytes;
+    const unsigned beat_count = size_bytes <= data_width_bytes ? 1 : size_bytes / data_width_bytes;
 
     *it = beat_count;
 
-    return it - write_data_beats_remaining.begin();
+    const uint16_t dbid = it - write_data_beats_remaining.begin();
+    write_txn_ids[dbid] = req_flit.phase.txn_id;
+    return dbid;
 }
 
 void CHIMemory::handle_write_dat(const CHIFlit& dat_flit)
 {
-    if (dat_flit.phase.dbid >= write_data_beats_remaining.size())
-        SC_REPORT_ERROR(name(), "write data with invalid DBID received");
+    /* Write data carries the DBID it was given in its TxnID field. */
+    const uint16_t dbid = dat_flit.phase.txn_id;
 
-    uint8_t& data_beats_remaining = write_data_beats_remaining[dat_flit.phase.dbid];
+    if (dbid >= write_data_beats_remaining.size() || write_data_beats_remaining[dbid] == 0)
+    {
+        SC_REPORT_ERROR(name(), "write data with invalid DBID received");
+        return;
+    }
+
+    uint8_t& data_beats_remaining = write_data_beats_remaining[dbid];
 
     data_beats_remaining--;
 
@@ -189,8 +204,10 @@ void CHIMemory::handle_write_dat(const CHIFlit& dat_flit)
                 cache_line[i] = dat_flit.payload.data[i];
         }
 
-        channels[ARM::CHI::CHANNEL_RSP].tx_queue.emplace_back(
-                dat_flit.payload, make_response_phase(dat_flit.phase, ARM::CHI::RSP_OPCODE_COMP));
+        /* Comp answers the request, so it carries the request's TxnID, not the DBID. */
+        ARM::CHI::Phase comp_phase = make_response_phase(dat_flit.phase, ARM::CHI::RSP_OPCODE_COMP);
+        comp_phase.txn_id = write_txn_ids[dbid];
+        channels[ARM::CHI::CHANNEL_RSP].tx_queue.emplace_back(dat_flit.payload, comp_phase);
     }
 }
 
@@ -216,6 +233,7 @@ tlm::tlm_sync_enum CHIMemory::nb_transport_fw(ARM::CHI::Payload& payload, ARM::C
 CHIMemory::CHIMemory(const sc_core::sc_module_name& name, const unsigned data_width_bits) :
     sc_core::sc_module(name),
     write_data_beats_remaining(10),
+    write_txn_ids(write_data_beats_remaining.size()),
     data_width_bytes{data_width_bits / 8},
     target("target", *this, &CHIMemory::nb_transport_fw, ARM::TLM::PROTOCOL_CHI_E, data_width_bits),
     clock("clock")
@@ -241,3 +259,6 @@ CHIMemory::CHIMemory(const sc_core::sc_module_name& name, const unsigned data_wi
     }
 }
 
+} // namespace Examples
+} // namespace CHI
+} // namespace ARM

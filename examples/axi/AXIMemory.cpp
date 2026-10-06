@@ -2,6 +2,10 @@
 
 #include "AXIMemory.h"
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 void AXIMemory::clock_posedge()
 {
     if (b_state == ACK)
@@ -145,3 +149,6 @@ AXIMemory::AXIMemory(sc_core::sc_module_name name) :
     dont_initialize();
 }
 
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM

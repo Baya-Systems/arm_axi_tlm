@@ -4,6 +4,8 @@
 #include "AXIMonitor.h"
 #include "AXIMemory.h"
 
+using namespace ARM::AXI4::Examples;
+
 void add_payloads_to_tg(AXITrafficGenerator& tg)
 {
     tg.add_payload(ARM::AXI::COMMAND_READ,  0x00001000, ARM::AXI::SIZE_16, 3);

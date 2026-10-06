@@ -6,6 +6,10 @@
 
 #include <ARM/TLM/arm_axi4.h>
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 #define MEMORY_SIZE (0x10000)
 
 class AXIMemory : public sc_core::sc_module
@@ -52,5 +56,9 @@ public:
 
     sc_core::sc_in<bool> clock;
 };
+
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM
 
 #endif /* ARM_AXI_MEMORY_H */

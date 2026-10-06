@@ -5,6 +5,10 @@
 
 #include <ARM/TLM/arm_axi4.h>
 
+namespace ARM {
+namespace AXI4 {
+namespace Examples {
+
 class AXIMonitor : public sc_core::sc_module
 {
 protected:
@@ -32,5 +36,9 @@ public:
     ARM::AXI::SimpleTargetSocket<AXIMonitor> target;
     ARM::AXI::SimpleInitiatorSocket<AXIMonitor> initiator;
 };
+
+} // namespace Examples
+} // namespace AXI4
+} // namespace ARM
 
 #endif /* ARM_AXI_MONITOR_H */

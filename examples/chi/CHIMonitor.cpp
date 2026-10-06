@@ -6,6 +6,10 @@
 #include "CHIMonitor.h"
 #include "CHIUtilities.h"
 
+namespace ARM {
+namespace CHI {
+namespace Examples {
+
 tlm::tlm_sync_enum CHIMonitor::nb_transport_fw(ARM::CHI::Payload& payload, ARM::CHI::Phase& phase)
 {
     initiator.nb_transport_fw(payload, phase);
@@ -355,3 +359,7 @@ CHIMonitor::CHIMonitor(const sc_core::sc_module_name& name, unsigned data_width_
     target("target", *this, &CHIMonitor::nb_transport_fw, ARM::TLM::PROTOCOL_CHI_E, data_width_bits),
     initiator("initiator", *this, &CHIMonitor::nb_transport_bw, ARM::TLM::PROTOCOL_CHI_E, data_width_bits)
 {}
+
+} // namespace Examples
+} // namespace CHI
+} // namespace ARM
